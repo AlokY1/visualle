@@ -64,11 +64,15 @@ def run(args):
     # Create model
     model = Oracle(args.method, bool(args.use_teacher_forcing))
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = model.to(device)
+
     # Perform forecasts
     gt, forecasts = [], []
     for data in tqdm(testloader, total=len(testloader)):
         with torch.no_grad():
             (X, y, _, _, _, _, _, _), _ = data
+            X = X.to(device)
             y_hat = model(X)
             forecasts.append(y_hat)
             gt.append(y)
